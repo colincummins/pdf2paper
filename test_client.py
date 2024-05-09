@@ -9,8 +9,10 @@ class TestClient:
 
     def mainloop(self):
         with open("longcat.jpg","rb") as image_file:
-            encoded_message = base64.b64encode(image_file.read())
-        self.socket.send(encoded_message)
+            encoded_message = base64.b64encode(image_file.read()).decode('utf-8')
+        message = {"type":"jpg", "payload": encoded_message}
+        message = json.dumps(message)
+        self.socket.send_string(message)
 
         encoded_message = self.socket.recv()
         with open("longcat.pdf","wb+") as pdf_file:
