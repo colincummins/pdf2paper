@@ -8,12 +8,15 @@ class TestClient:
         self.socket.connect("tcp://{}:{}".format(address, port))
 
     def mainloop(self):
-        for i in range(10):
-            message = input("Enter message:")
-            encoded_message = base64.b64encode(bytes(message, 'utf-8'))
-            self.socket.send(encoded_message)
-            print(self.socket.recv())
+        with open("longcat.jpg","rb") as image_file:
+            encoded_message = base64.b64encode(image_file.read())
+        self.socket.send(encoded_message)
 
+        encoded_message = self.socket.recv()
+        with open("longcat.pdf","wb+") as pdf_file:
+            decoded_file = base64.b64decode((encoded_message))
+            pdf_file.write(decoded_file)
+        print("PDF received")
 
 if __name__ == "__main__":
     client = TestClient("localhost", 5555)
