@@ -1,24 +1,30 @@
 import json
 
+
 class UnrecognizedFileTypeError(Exception):
     """
     Raised when handler does not recognize value in the 'file_type' field
     """
-    pass
+
+    def __init__(self):
+        self.message = f"File type not recognized"
+        super().__init__(self.message)
+
 
 class MissingRequiredFieldError(Exception):
     """
     Raised when handler receives a JSON without a required field
     """
+
     def __init__(self, missing_field):
-        self.message = f"JSON is missing required {} field".format(missing_field)
+        self.message = f"JSON is missing required {missing_field} field"
         super().__init__(self.message)
 
 
 class MessageHandler:
-    def __init__(self, string_to_func:dict, required_fields:list[str]) -> None:
+    def __init__(self, string_to_func: dict, required_fields: list[str]) -> None:
         self.function_dictionary = string_to_func
-        self.require_fields = required_fields
+        self.required_fields = required_fields
 
     def validate_json(self, message_json: dict) -> bool:
         """
@@ -34,7 +40,7 @@ class MessageHandler:
         if message_json['type'] not in self.function_dictionary:
             raise UnrecognizedFileTypeError
 
-    def generate_reply(self, message:dict):
+    def generate_reply(self, message: dict):
         """
         Takes a 'message' dict, validates it, then uses the function corresponding to 'type' from the handlers
         dictionary of functions to generate the payload for a reply dictionary object
@@ -45,20 +51,11 @@ class MessageHandler:
         try:
             self.validate_json(message)
             payload = self.function_dictionary[message['type']](message['payload'])
-            reply = {"status":"ok", "payload": payload}
+            reply = {"status": "ok", "payload": payload}
+        except (UnrecognizedFileTypeError, MissingRequiredFieldError) as error:
+            reply = {"status": "error", "payload": error.message}
         except Exception as error:
-            reply = {"status":"error", error}
+            reply = {"status": "error", "payload": "Server error: " + str(error)}
 
-        return reply
-
-
-
-
-
-
-
-
-
-
-
-
+        finally:
+            return reply
