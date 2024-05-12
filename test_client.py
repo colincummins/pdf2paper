@@ -1,7 +1,5 @@
-import json
 import zmq
 import base64
-
 
 class TestClient:
     def __init__(self, address: str = "localhost", port: int = 5555):
@@ -12,12 +10,14 @@ class TestClient:
     def mainloop(self):
         with open("longcat.jpg", "rb") as image_file:
             encoded_message = base64.b64encode(image_file.read()).decode('utf-8')
-        message = {"type": "jpg", "payload": encoded_message}
+        message = {"type": "img", "payload": encoded_message}
         self.socket.send_json(message)
 
-        encoded_message = self.socket.recv()
+        reply:dict = self.socket.recv_json()
+        print(reply)
+
         with open("longcat.pdf", "wb+") as pdf_file:
-            decoded_file = base64.b64decode(encoded_message)
+            decoded_file = base64.b64decode(reply['payload'])
             pdf_file.write(decoded_file)
         print("PDF received")
 
