@@ -1,9 +1,9 @@
-import base64
-import json
-
 import zmq
-import base64
-from PIL import Image
+import message_handler
+from img_to_pdf import img_to_pdf
+
+HANDLER_FUNCTIONS = {'img':img_to_pdf}
+HANDLER_REQUIRED_FIELDS = ['type','payload']
 
 
 
@@ -16,18 +16,14 @@ class Server:
         self.socket.bind("tcp://*:{}".format(self.port))
 
     def mainloop(self):
+        msg_handler = message_handler.MessageHandler(HANDLER_FUNCTIONS, HANDLER_REQUIRED_FIELDS)
+
         while True:
             message = self.socket.recv_json()
-            with open("received_image.jpg","wb+") as img_file:
-                img_file.write(base64.b64decode(message['payload']))
-            image_to_convert = Image.open("received_image.jpg")
-            image_to_convert.save("received_image.pdf","PDF")
-            with open("received_image.pdf", "rb") as pdf_data:
-                encoded_pdf = base64.b64encode(pdf_data.read()).decode('utf-8')
 
-            message = {"status": "success", "payload": encoded_pdf}
+            reply = msg_handler.generate_reply(message)
 
-            self.socket.send_json(message)
+            self.socket.send_json(reply)
 
 if __name__ == "__main__":
     server = Server(5555)
