@@ -1,6 +1,7 @@
 import zmq
 import message_handler
 from img_to_pdf import img_to_pdf
+from server_enf import PORT
 
 HANDLER_FUNCTIONS = {'img':img_to_pdf}
 HANDLER_REQUIRED_FIELDS = ['type','payload']
@@ -9,7 +10,7 @@ HANDLER_REQUIRED_FIELDS = ['type','payload']
 
 
 class Server:
-    def __init__(self, port:int=5555):
+    def __init__(self, port:int):
         self.port = str(port)
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REP)
@@ -31,6 +32,6 @@ class Server:
 
 
 if __name__ == "__main__":
-    server = Server(5555)
+    server = Server(PORT)
     server.mainloop()
 
