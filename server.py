@@ -19,11 +19,16 @@ class Server:
         msg_handler = message_handler.MessageHandler(HANDLER_FUNCTIONS, HANDLER_REQUIRED_FIELDS)
 
         while True:
-            message = self.socket.recv_json()
+            try:
+                message = self.socket.recv_json()
 
-            reply = msg_handler.generate_reply(message)
+                reply = msg_handler.generate_reply(message)
+
+            except Exception as error:
+                reply = {"status": "error", "payload": "Server error: " + str(error)}
 
             self.socket.send_json(reply)
+
 
 if __name__ == "__main__":
     server = Server(5555)
