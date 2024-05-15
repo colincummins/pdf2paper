@@ -25,7 +25,7 @@ class TestClient:
         # Test text conversion
         with open("lorem_ipsum.txt", "rb") as text_file:
             encoded_message = base64.b64encode(text_file.read()).decode('utf-8')
-        message = {"type": "text", "payload": encoded_message}
+        message = {"type": "text", "payload": encoded_message, "font": "Arial", "size": "15"}
         self.socket.send_json(message)
 
         reply:dict = self.socket.recv_json()
