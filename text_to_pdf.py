@@ -1,17 +1,17 @@
-import base64
 from fpdf import FPDF
 
 
-def text_to_pdf(payload, font="Courier", size="12", left="20", top="20", right="-1", **kwargs) -> str:
+def text_to_pdf(payload, font="Courier", size="12", left="20", top="20", right="-1", **kwargs) -> bytes:
     """
-    Converts text file to pdf
-    Adapted from https://www.geeksforgeeks.org/convert-text-and-text-file-to-pdf-using-python/
-
-    :param payload: Base64 encoded text
+    Convert text to pdf
+    :param payload: Plaintext to convert. User must include newlines if they want wrapping
     :param font: Font [str]
     :param size: Font size [str]
-    :param image_data: Json with Base64 encoded image file dump as 'payload'
-    :return: Base64 encoded file dump of resulting pdf
+    :param left: Left Margin in cm [str]
+    :param top: Top Margin in cm [str]
+    :param right: Right Margin [str]
+    :param kwargs: Unprocessed keywords [str]
+    :return: Bytes dump of PDF version of the text, right justified [bytes]
     """
 
     with open("temp_text_file", "wb+") as txt:
@@ -29,5 +29,4 @@ def text_to_pdf(payload, font="Courier", size="12", left="20", top="20", right="
         pdf.output("temp.pdf")
 
     with open("temp.pdf", "rb") as temp:
-        payload = base64.b64encode(temp.read()).decode('utf-8')
-    return payload
+        return temp.read()

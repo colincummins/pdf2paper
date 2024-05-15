@@ -33,6 +33,16 @@ class PayloadNotBase64Error(Exception):
         super().__init__(self.message)
 
 
+class CantEncodePayloadError(Exception):
+    """
+    Raised when message payload cannot be decoded from base64
+    """
+
+    def __init__(self):
+        self.message = f"Cannot encode payload into base64"
+        super().__init__(self.message)
+
+
 def decode_payload(message: dict) -> dict:
     """
     Decodes the 'payload' attribute of 'message' from base64
@@ -45,6 +55,20 @@ def decode_payload(message: dict) -> dict:
         return message
     except binascii.Error:
         raise PayloadNotBase64Error
+
+
+def encode_payload(message: dict) -> dict:
+    """
+    Encodes the 'payload' attribute of 'message' into base64
+    :type message: [dict]
+    :param message: Dict with 'payload' attribute
+    :return: 'message' dict but with 'payload' encoded base64
+    """
+    try:
+        message['payload'] = base64.b64encode(message['payload']).decode("utf-8")
+        return message
+    except binascii.Error:
+        raise CantEncodePayloadError
 
 
 class MessageHandler:
@@ -74,7 +98,8 @@ class MessageHandler:
             message = decode_payload(message)
             reply_payload = self.function_dictionary[message['type']](**message)
             reply = {"status": "ok", "payload": reply_payload}
-        except (UnrecognizedFileTypeError, MissingPayloadError, PayloadNotBase64Error) as error:
+            reply = encode_payload(reply)
+        except (UnrecognizedFileTypeError, MissingPayloadError, PayloadNotBase64Error, CantEncodePayloadError) as error:
             reply = {"status": "error", "payload": error.message}
         except KeyError as error:
             reply = {"status": "error", "payload": "JSON object missing required field" + error.message}
