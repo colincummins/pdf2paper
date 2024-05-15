@@ -34,9 +34,9 @@ class Server:
             except Exception as error:
                 print("{date} {error}".format(date=datetime.datetime.now(), error=error))
                 reply = {"status": "error", "payload": str(error)}
-            finally:
-                print(json.dumps(reply, indent=4))
-                self.socket.send_json(reply)
+
+            print(json.dumps(reply, indent=4))
+            self.socket.send_json(reply)
 
 
 if __name__ == "__main__":
