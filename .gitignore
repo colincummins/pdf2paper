@@ -158,4 +158,14 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+/.idea/.gitignore
+/longcat.pdf
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/pdfmaker.iml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/inspectionProfiles/Project_Default.xml
+/received_image.jpg
+/received_image.pdf
+/.idea/vcs.xml
 /server_env.py
