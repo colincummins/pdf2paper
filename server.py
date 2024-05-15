@@ -11,16 +11,18 @@ HANDLER_REQUIRED_FIELDS = ['type', 'payload']
 
 
 class Server:
-    def __init__(self, port: int):
+    handler: object | None
+
+    def __init__(self, port: int, msg_handler: message_handler.MessageHandler):
         self.port = str(port)
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REP)
         self.socket.bind("tcp://*:{}".format(self.port))
+        self.handler: message_handler.MessageHandler = msg_handler
 
     def mainloop(self):
         print("{date} - ZMQ REP/REQ server listening on port {port} :".format(date=datetime.datetime.now(),
                                                                               port=self.port))
-        msg_handler = message_handler.MessageHandler(HANDLER_FUNCTIONS)
 
         while True:
             try:
@@ -28,7 +30,7 @@ class Server:
                 print("{date} - Message received :".format(date=datetime.datetime.now()))
                 print(json.dumps(message, indent=4))
 
-                reply = msg_handler.generate_reply(message)
+                reply = self.handler.generate_reply(message)
 
             except Exception as error:
                 print("{date} {error}".format(date=datetime.datetime.now(), error=error))
@@ -40,5 +42,8 @@ class Server:
 
 
 if __name__ == "__main__":
-    server = Server(PORT)
+    handler: message_handler.MessageHandler = message_handler.MessageHandler()
+    for filetype, f in HANDLER_FUNCTIONS.items():
+        handler.add_function(filetype, f)
+    server = Server(PORT, handler)
     server.mainloop()

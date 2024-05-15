@@ -1,5 +1,4 @@
 import binascii
-import json
 import base64
 
 
@@ -60,9 +59,10 @@ def decode_payload(message: dict) -> dict:
 def encode_payload(message: dict) -> dict:
     """
     Encodes the 'payload' attribute of 'message' into base64
+    :rtype:
     :type message: [dict]
     :param message: Dict with 'payload' attribute
-    :return: 'message' dict but with 'payload' encoded base64
+    :return: 'message' dict but with 'payload' encoded base64 [dict | None]
     """
     try:
         message['payload'] = base64.b64encode(message['payload']).decode("utf-8")
@@ -72,10 +72,16 @@ def encode_payload(message: dict) -> dict:
 
 
 class MessageHandler:
-    def __init__(self, string_to_func: dict) -> None:
-        self.function_dictionary = string_to_func
+    def __init__(self, string_to_func=None) -> None:
+        if string_to_func is None:
+            self.function_dictionary = dict()
+        else:
+            self.function_dictionary = string_to_func
 
-    def validate_json(self, message_json: dict) -> bool:
+    def add_function(self, file_type: str, f: object) -> None:
+        self.function_dictionary[file_type] = f
+
+    def validate_json(self, message_json: dict) -> None:
         """
         Checks JSON for presence of required fields, and confirms that files is
         a type that can be handled by the MessageHandler
@@ -102,7 +108,7 @@ class MessageHandler:
         except (UnrecognizedFileTypeError, MissingPayloadError, PayloadNotBase64Error, CantEncodePayloadError) as error:
             reply = {"status": "error", "payload": error.message}
         except KeyError as error:
-            reply = {"status": "error", "payload": "JSON object missing required field" + error.message}
+            reply = {"status": "error", "payload": "JSON object missing required field" + str(error)}
         except Exception as error:
             reply = {"status": "error", "payload": "Server error: " + str(error)}
         finally:
