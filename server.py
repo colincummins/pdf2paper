@@ -3,9 +3,10 @@ import datetime
 import zmq
 import message_handler
 from img_to_pdf import img_to_pdf
+from text_to_pdf import text_to_pdf
 from server_env import PORT
 
-HANDLER_FUNCTIONS = {'img': img_to_pdf}
+HANDLER_FUNCTIONS = {'img': img_to_pdf, 'text': text_to_pdf}
 HANDLER_REQUIRED_FIELDS = ['type', 'payload']
 
 
