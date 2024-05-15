@@ -11,7 +11,7 @@ def img_to_pdf(payload, **kwargs) -> str:
     """
 
     with open("received_image.jpg", "wb+") as img_file:
-        img_file.write(base64.b64decode(payload))
+        img_file.write(payload)
     image_to_convert = Image.open("received_image.jpg")
     image_to_convert.save("received_image.pdf", "PDF")
     with open("received_image.pdf", "rb") as pdf_data:

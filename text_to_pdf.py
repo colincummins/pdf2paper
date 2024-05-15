@@ -15,7 +15,7 @@ def text_to_pdf(payload, font="Courier", size="12", left="20", top="20", right="
     """
 
     with open("temp_text_file", "wb+") as txt:
-        txt.write(base64.b64decode(payload))
+        txt.write(payload)
     with open("temp_text_file", "r") as txt:
         pdf = FPDF()
         pdf.set_margins(float(left), float(top), float(right))

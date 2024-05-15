@@ -37,6 +37,7 @@ class TestClient:
         print("Text PDF received")
 
 
+
 if __name__ == "__main__":
     client = TestClient("localhost", 5555)
     client.mainloop()

@@ -1,4 +1,6 @@
+import binascii
 import json
+import base64
 
 
 class UnrecognizedFileTypeError(Exception):
@@ -9,6 +11,40 @@ class UnrecognizedFileTypeError(Exception):
     def __init__(self):
         self.message = f"File type not recognized"
         super().__init__(self.message)
+
+
+class MissingPayloadError(Exception):
+    """
+    Raised when JSON message has no payload
+    """
+
+    def __init__(self):
+        self.message = f"Message has no payload"
+        super().__init__(self.message)
+
+
+class PayloadNotBase64Error(Exception):
+    """
+    Raised when message payload cannot be decoded from base64
+    """
+
+    def __init__(self):
+        self.message = f"Message payload cannot be decoded from base64"
+        super().__init__(self.message)
+
+
+def decode_payload(message: dict) -> dict:
+    """
+    Decodes the 'payload' attribute of 'message' from base64
+    :type message: [dict]
+    :param message: Dict with 'payload' attribute of base64 encoded data
+    :return: 'message' dict but with 'payload' decoded
+    """
+    try:
+        message['payload'] = base64.b64decode(message['payload'])
+        return message
+    except binascii.Error:
+        raise PayloadNotBase64Error
 
 
 class MessageHandler:
@@ -29,21 +65,20 @@ class MessageHandler:
     def generate_reply(self, message: dict):
         """
         Takes a 'message' dict, validates it, then uses the function corresponding to 'type' from the handlers
-        dictionary of functions to generate the payload for a reply dictionary object
-        If the message is invalid or some error occurs with payload creation, an error dictionary will be returned instead
-        :param message: JSON/dict with a 'type' and 'payload' field
-        :return: JSON/dict with a 'status' and 'payload' field.
+        dictionary of functions to generate the payload for a reply dictionary object If the message is invalid or
+        some error occurs with payload creation, an error dictionary will be returned instead :param message:
+        JSON/dict with a 'type' and 'payload' field :return: JSON/dict with a 'status' and 'payload' field.
         """
         try:
             self.validate_json(message)
-            payload = self.function_dictionary[message['type']](**message)
-            reply = {"status": "ok", "payload": payload}
-        except UnrecognizedFileTypeError as error:
+            message = decode_payload(message)
+            reply_payload = self.function_dictionary[message['type']](**message)
+            reply = {"status": "ok", "payload": reply_payload}
+        except (UnrecognizedFileTypeError, MissingPayloadError, PayloadNotBase64Error) as error:
             reply = {"status": "error", "payload": error.message}
         except KeyError as error:
             reply = {"status": "error", "payload": "JSON object missing required field" + error.message}
         except Exception as error:
             reply = {"status": "error", "payload": "Server error: " + str(error)}
-
         finally:
             return reply

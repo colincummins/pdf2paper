@@ -18,7 +18,8 @@ class Server:
         self.socket.bind("tcp://*:{}".format(self.port))
 
     def mainloop(self):
-        print("{date} - ZMQ REP/REQ server listening on port {port} :".format(date=datetime.datetime.now(), port=self.port))
+        print("{date} - ZMQ REP/REQ server listening on port {port} :".format(date=datetime.datetime.now(),
+                                                                              port=self.port))
         msg_handler = message_handler.MessageHandler(HANDLER_FUNCTIONS)
 
         while True:
@@ -27,15 +28,15 @@ class Server:
                 print("{date} - Message received :".format(date=datetime.datetime.now()))
                 print(json.dumps(message, indent=4))
 
-                reply = msg_handler.generate_reply(message)
                 print("{date} - Sending reply:".format(date=datetime.datetime.now()))
-                print(json.dumps(reply, indent=4))
+                reply = msg_handler.generate_reply(message)
 
             except Exception as error:
-                print("{date} Server error {error}".format(date=datetime.datetime.now(), error=error))
-                reply = {"status": "error", "payload": "Server error: " + str(error)}
-
-            self.socket.send_json(reply)
+                print("{date} {error}".format(date=datetime.datetime.now(), error=error))
+                reply = {"status": "error", "payload": str(error)}
+            finally:
+                print(json.dumps(reply, indent=4))
+                self.socket.send_json(reply)
 
 
 if __name__ == "__main__":
