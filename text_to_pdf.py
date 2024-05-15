@@ -25,8 +25,5 @@ def text_to_pdf(payload, font="Courier", size="12", left="20", top="20", right="
         for x in txt:
             pdf.cell(200, 10, txt=x, ln=1, align='L')
 
-        # save the pdf with name .pdf
-        pdf.output("temp.pdf")
-
-    with open("temp.pdf", "rb") as temp:
-        return temp.read()
+        # Return as a byte stream. The 'latin-1' encoding is per PyPDF instructions for coercing output to bytes
+        return pdf.output(dest="S").encode('latin-1')
