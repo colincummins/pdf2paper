@@ -5,7 +5,15 @@ import message_handler
 
 
 class ZMQServer:
+    """
+    Listens on designated port for incoming JSON objects, sends them to file handler for processing.
+    """
     def __init__(self, port: int, handler_functions: dict) -> None:
+        """
+        :param port: Port for server to listen on [int]
+        :param handler_functions: A dictionary of file_types:functions. The function will be used by the file handler
+        to process incoming payloads
+        """
         self.port = str(port)
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REP)
@@ -13,6 +21,10 @@ class ZMQServer:
         self.message_handler = message_handler.MessageHandler(handler_functions)
 
     def mainloop(self):
+        """
+        Main logic loop. Run this method to start server.
+        :return:
+        """
         print("{date} - ZMQ REP/REQ server listening on port {port} :".format(date=datetime.datetime.now(),
                                                                               port=self.port))
 

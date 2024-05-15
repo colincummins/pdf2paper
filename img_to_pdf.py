@@ -3,10 +3,10 @@ from PIL import Image
 
 def img_to_pdf(payload, **kwargs) -> bytes:
     """
-    Takes base64 encoded image file dump and converts to pdf.
-    Returns base64 encoded file dump of resulting pdf file
-    :param payload: Base64 encoded image file dump
-    :return: Base64 encoded file dump of resulting pdf
+    Converts an image into a pdf.
+    :param payload: Image data. JPG, PNG, and other PIL library formats accepted. [bytes]
+    :param kwargs: Unused arguments
+    :return: Image converted to PDF [bytes]
     """
 
     with open("received_image.jpg", "wb+") as img_file:

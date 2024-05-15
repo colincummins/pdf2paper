@@ -3,7 +3,10 @@ from fpdf import FPDF
 
 def text_to_pdf(payload, font="Courier", size="12", left="20", top="20", right="-1", **kwargs) -> bytes:
     """
-    Convert text to pdf
+    Convert text to pdf. Formatting is currently very simple - just margins, font size and font type.
+    User must incorporate their own newlines and wrapping to fit their chosen font size and type.
+    Recommend a wrap of 70 characters per line if using the default settings.
+
     :param payload: Plaintext to convert. User must include newlines if they want wrapping
     :param font: Font [str]
     :param size: Font size [str]

@@ -34,7 +34,7 @@ class PayloadNotBase64Error(Exception):
 
 class CantEncodePayloadError(Exception):
     """
-    Raised when message payload cannot be decoded from base64
+    Raised when message payload cannot be encoded into base64
     """
 
     def __init__(self):
@@ -46,8 +46,9 @@ def decode_payload(message: dict) -> dict:
     """
     Decodes the 'payload' attribute of 'message' from base64
     :type message: [dict]
-    :param message: Dict with 'payload' attribute of base64 encoded data
+    :param message: Dict with 'payload' attribute of base64 encoded data [dict]
     :return: 'message' dict but with 'payload' decoded
+    :except: PayloadNotBase64Error
     """
     try:
         message['payload'] = base64.b64decode(message['payload'])
@@ -58,11 +59,9 @@ def decode_payload(message: dict) -> dict:
 
 def encode_payload(message: dict) -> dict:
     """
-    Encodes the 'payload' attribute of 'message' into base64
-    :rtype:
-    :type message: [dict]
-    :param message: Dict with 'payload' attribute
-    :return: 'message' dict but with 'payload' encoded base64 [dict | None]
+    Encodes the 'payload' attribute of message into base64
+    :param message: Dict with attribute 'payload' [dict]
+    :return: Dict with updated payload attribute [dict]
     """
     try:
         message['payload'] = base64.b64encode(message['payload']).decode("utf-8")
@@ -72,32 +71,45 @@ def encode_payload(message: dict) -> dict:
 
 
 class MessageHandler:
+    """
+    This class acts as a kind of router for incoming messages.
+    It validates them, checks what file type the payload is, processes the payload according to that type, and
+    composes a response JSON (or error JSON if an error occurs)
+    """
     def __init__(self, string_to_func=None) -> None:
+        """
+        Constructor
+        :param string_to_func: Dictionary of file_types and the functions we use to process payloads of that type [dict]
+        """
         if string_to_func is None:
             self.function_dictionary = dict()
         else:
             self.function_dictionary = string_to_func
 
     def add_function(self, file_type: str, f: object) -> None:
+        """
+        Although we normally add file_type/function pairs at creation, we can add more with this function
+        :param file_type: Type of file to be routed [str]
+        :param f: Function to process the incoming file [function]
+        :return: None
+        """
         self.function_dictionary[file_type] = f
 
     def validate_json(self, message_json: dict) -> None:
         """
-        Checks JSON for presence of required fields, and confirms that files is
-        a type that can be handled by the MessageHandler
-        :param message_json: [dict]
-        :return: None
-        :except: Raises descriptive error if json is missing required fields or file type not recognized
+        Checks that file type can be handled by this handler
         """
         if message_json['type'] not in self.function_dictionary:
             raise UnrecognizedFileTypeError
 
     def generate_reply(self, message: dict):
         """
-        Takes a 'message' dict, validates it, then uses the function corresponding to 'type' from the handlers
-        dictionary of functions to generate the payload for a reply dictionary object If the message is invalid or
-        some error occurs with payload creation, an error dictionary will be returned instead :param message:
-        JSON/dict with a 'type' and 'payload' field :return: JSON/dict with a 'status' and 'payload' field.
+        Takes an incoming message, validates it, decodes payload, processes that payload according to file type,
+        re-encodes payload to base64, then composes and sends a response with the
+        processed payload (or an error response)
+        :param message: JSON-type dict with at least a 'type' and 'payload' attribute, plus any others required by
+        the file processing function [dict]
+        :return:
         """
         try:
             self.validate_json(message)
