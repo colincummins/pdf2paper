@@ -169,3 +169,7 @@ cython_debug/
 /received_image.pdf
 /.idea/vcs.xml
 /server_env.py
+/lorem_ipsum.pdf
+/.idea/pdfmaker-zmq.iml
+/temp.pdf
+/temp_text_file
