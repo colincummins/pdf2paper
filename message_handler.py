@@ -11,20 +11,9 @@ class UnrecognizedFileTypeError(Exception):
         super().__init__(self.message)
 
 
-class MissingRequiredFieldError(Exception):
-    """
-    Raised when handler receives a JSON without a required field
-    """
-
-    def __init__(self, missing_field):
-        self.message = f"JSON is missing required {missing_field} field"
-        super().__init__(self.message)
-
-
 class MessageHandler:
-    def __init__(self, string_to_func: dict, required_fields: list[str]) -> None:
+    def __init__(self, string_to_func: dict) -> None:
         self.function_dictionary = string_to_func
-        self.required_fields = required_fields
 
     def validate_json(self, message_json: dict) -> bool:
         """
@@ -34,9 +23,6 @@ class MessageHandler:
         :return: None
         :except: Raises descriptive error if json is missing required fields or file type not recognized
         """
-        for field in self.required_fields:
-            if field not in message_json:
-                raise MissingRequiredFieldError(field)
         if message_json['type'] not in self.function_dictionary:
             raise UnrecognizedFileTypeError
 
@@ -50,10 +36,12 @@ class MessageHandler:
         """
         try:
             self.validate_json(message)
-            payload = self.function_dictionary[message['type']](message['payload'])
+            payload = self.function_dictionary[message['type']](**message)
             reply = {"status": "ok", "payload": payload}
-        except (UnrecognizedFileTypeError, MissingRequiredFieldError) as error:
+        except UnrecognizedFileTypeError as error:
             reply = {"status": "error", "payload": error.message}
+        except KeyError as error:
+            reply = {"status": "error", "payload": "JSON object missing required field" + error.message}
         except Exception as error:
             reply = {"status": "error", "payload": "Server error: " + str(error)}
 

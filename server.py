@@ -18,7 +18,7 @@ class Server:
 
     def mainloop(self):
         print("{date} - ZMQ REP/REQ server listening on port {port} :".format(date=datetime.datetime.now(), port=self.port))
-        msg_handler = message_handler.MessageHandler(HANDLER_FUNCTIONS, HANDLER_REQUIRED_FIELDS)
+        msg_handler = message_handler.MessageHandler(HANDLER_FUNCTIONS)
 
         while True:
             try:
