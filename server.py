@@ -28,13 +28,13 @@ class Server:
                 print("{date} - Message received :".format(date=datetime.datetime.now()))
                 print(json.dumps(message, indent=4))
 
-                print("{date} - Sending reply:".format(date=datetime.datetime.now()))
                 reply = msg_handler.generate_reply(message)
 
             except Exception as error:
                 print("{date} {error}".format(date=datetime.datetime.now(), error=error))
                 reply = {"status": "error", "payload": str(error)}
 
+            print("{date} - Sending reply:".format(date=datetime.datetime.now()))
             print(json.dumps(reply, indent=4))
             self.socket.send_json(reply)
 
