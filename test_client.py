@@ -1,6 +1,6 @@
 import zmq
 import base64
-
+import json
 
 class TestClient:
     def __init__(self, address: str = "localhost", port: int = 5555):
@@ -16,7 +16,7 @@ class TestClient:
         self.socket.send_json(message)
 
         reply: dict = self.socket.recv_json()
-        print(reply)
+        print(json.dumps(reply, indent=2))
 
         with open("longcat.pdf", "wb+") as pdf_file:
             decoded_file = base64.b64decode(reply['payload'])
@@ -30,7 +30,8 @@ class TestClient:
         self.socket.send_json(message)
 
         reply: dict = self.socket.recv_json()
-        print(reply)
+        print(json.dumps(reply, indent=2))
+
 
         with open("lorem_ipsum.pdf", "wb+") as pdf_file:
             decoded_file = base64.b64decode(reply['payload'])
