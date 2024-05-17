@@ -34,6 +34,7 @@ class ZMQServer:
                 print("{date} - Message received :".format(date=datetime.datetime.now()))
                 print(json.dumps(message, indent=4))
 
+                print("Converting payload...\n")
                 reply = self.message_handler.generate_reply(message)
                 print("{date} - Sending reply:".format(date=datetime.datetime.now()))
                 print(json.dumps(reply, indent=4))
