@@ -10,7 +10,7 @@ ZeroMQ microservice for converting text or images to PDF
 
 ## How to Request Data from Microservice
 ### Overview
-The client program needs to use ZMQs `.send_json()` to send a JSON object to the server
+The client program needs to use ZMQ's `.send_json()` to send a JSON object to the server.\
 The file data payload transmitted must be bytes-type data, encoded in base64 (see below for example)
 
 ### JSON format
@@ -44,7 +44,7 @@ socket.send_json(message)
 ~~~
 
 ## How to Receive Data from Microservice
-Call socket.recv_json() to get back a reply.
+Call socket.recv_json() to receive a reply.
 ### Example Call (with decoding of successfully converted PDF data)
 ~~~
 # Get reply from microservice
@@ -79,3 +79,4 @@ Once the text/image has been sent in the microservice, a JSON response is sent b
 }
 ~~~
 ## UML Diagram
+![pdfmaker_uml.png](pdfmaker_uml.png)
